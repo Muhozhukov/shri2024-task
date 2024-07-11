@@ -1,23 +1,20 @@
-# Logs
-logs
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+# Ignore Node.js build files
+node_modules/
 
-node_modules
-dist-ssr
-*.local
+# Ignore any local development configuration
+.env
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
+# Ignore Mac-specific files
 .DS_Store
-*.suo
-*.ntvs*
-*.njsproj
-*.sln
-*.sw?
+
+# Ignore editor-specific files
+*.log
+*.log.*
+*.sublime-*
+
+# Ignore OS generated files
+.DS_Store
+Thumbs.db
+
+# Ignore npm-debug.log files
+npm-debug.log
