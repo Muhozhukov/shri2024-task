@@ -5,7 +5,7 @@
     <meta name="viewport"
           content="width=device-width, initial-scale=1.0">
     <title>Яндекс.Дом</title>
-    <link rel="preload" as="font" href="assets/lato.woff2" type="font/woff2" crossorigin="anonymous">
+    <link as="font" href="assets/lato.woff2" type="font/woff2" crossorigin="anonymous">
     <script defer src="vendors/react-with-dom.js"></script>
     <link rel="stylesheet" type="text/css" href="reset.css">
     <link rel="stylesheet" type="text/css" href="styles.css">
@@ -81,7 +81,7 @@
             if (onSize) {
                 onSize({ width, height });
             }
-        });
+        }, [onSize]);
 
         return <li ref={ref} className={'event' + (props.slim ? ' event_slim' : '')}>
             <button className="event__button">
@@ -207,18 +207,12 @@
     }
     const TABS_KEYS = Object.keys(TABS);
 
-    function Main() {
-        const ref = React.useRef();
+    function Devices() {
+        console.log('render')
+        const ref  = React.useRef();
         const initedRef = React.useRef(false);
         const [activeTab, setActiveTab] = React.useState('');
         const [hasRightScroll, setHasRightScroll] = React.useState(false);
-
-        React.useEffect(() => {
-            if (!activeTab && !initedRef.current) {
-                initedRef.current = true;
-                setActiveTab(new URLSearchParams(location.search).get('tab') || 'all');
-            }
-        });
 
         const onSelectInput = event => {
             setActiveTab(event.target.value);
@@ -230,14 +224,22 @@
         };
 
         React.useEffect(() => {
+            if (!activeTab && !initedRef.current) {
+                initedRef.current = true;
+                setActiveTab(new URLSearchParams(location.search).get('tab') || 'all');
+            }
+        }, []);
+
+        React.useEffect(() => {
             const sumWidth = sizes.reduce((acc, item) => acc + item.width, 0);
             const sumHeight = sizes.reduce((acc, item) => acc + item.height, 0);
-
+            console.log('ref',sumWidth)
             const newHasRightScroll = sumWidth > ref.current.offsetWidth;
+            console.log(newHasRightScroll, 22)
             if (newHasRightScroll !== hasRightScroll) {
                 setHasRightScroll(newHasRightScroll);
             }
-        });
+        }, [ref, sizes]);
 
         const onArrowCLick = () => {
             const scroller = ref.current.querySelector('.section__panel:not(.section__panel_hidden)');
@@ -248,7 +250,62 @@
                 });
             }
         };
+        return (
+            <section className="section main__devices">
+                <div className="section__title">
+                    <h2 className="section__title-header">
+                        Избранные устройства
+                    </h2>
 
+                    <select className="section__select" defaultValue="all" onInput={onSelectInput}>
+                        {TABS_KEYS.map(key =>
+                            <option key={key} value={key}>
+                                {TABS[key].title}
+                            </option>
+                        )}
+                    </select>
+
+                    <ul role="tablist" className="section__tabs">
+                        {TABS_KEYS.map(key =>
+                            <li
+                                key={key}
+                                role="tab"
+                                aria-selected={key === activeTab ? 'true' : 'false'}
+                                tabIndex={key === activeTab ? '0' : undefined}
+                                className={'section__tab' + (key === activeTab ? ' section__tab_active' : '')}
+                                id={`tab_${key}`}
+                                aria-controls={`panel_${key}`}
+                                onClick={() => setActiveTab(key)}
+                            >
+                                {TABS[key].title}
+                            </li>
+                        )}
+                    </ul>
+                </div>
+
+                <div className="section__panel-wrapper" ref={ref}>
+                    {TABS_KEYS.map(key =>
+                        <div key={key} role="tabpanel" className={'section__panel' + (key === activeTab ? '' : ' section__panel_hidden')} aria-hidden={key === activeTab ? 'false' : 'true'} id={`panel_${key}`} aria-labelledby={`tab_${key}`}>
+                            <ul className="section__panel-list">
+                                {TABS[key].items.map((item, index) =>
+                                    <Event
+                                        key={index}
+                                        {...item}
+                                        onSize={onSize}
+                                    />
+                                )}
+                            </ul>
+                        </div>
+                    )}
+                    {hasRightScroll &&
+                        <div className="section__arrow" onClick={onArrowCLick}></div>
+                    }
+                </div>
+            </section>
+        )
+    }
+
+    function Main() {
         return <main className="main">
             <section className="section main__general">
                 <h2 className="section__title section__title-header section__main-title">Главное</h2>
@@ -340,69 +397,17 @@
                 </ul>
             </section>
 
-            <section className="section main__devices">
-                <div className="section__title">
-                    <h2 className="section__title-header">
-                        Избранные устройства
-                    </h2>
-
-                    <select className="section__select" defaultValue="all" onInput={onSelectInput}>
-                        {TABS_KEYS.map(key =>
-                            <option key={key} value={key}>
-                                {TABS[key].title}
-                            </option>
-                        )}
-                    </select>
-
-                    <ul role="tablist" className="section__tabs">
-                        {TABS_KEYS.map(key =>
-                            <li
-                                key={key}
-                                role="tab"
-                                aria-selected={key === activeTab ? 'true' : 'false'}
-                                tabIndex={key === activeTab ? '0' : undefined}
-                                className={'section__tab' + (key === activeTab ? ' section__tab_active' : '')}
-                                id={`tab_${key}`}
-                                aria-controls={`panel_${key}`}
-                                onClick={() => setActiveTab(key)}
-                            >
-                                {TABS[key].title}
-                            </li>
-                        )}
-                    </ul>
-                </div>
-
-                <div className="section__panel-wrapper" ref={ref}>
-                    {TABS_KEYS.map(key =>
-                        <div key={key} role="tabpanel" className={'section__panel' + (key === activeTab ? '' : ' section__panel_hidden')} aria-hidden={key === activeTab ? 'false' : 'true'} id={`panel_${key}`} aria-labelledby={`tab_${key}`}>
-                            <ul className="section__panel-list">
-                                {TABS[key].items.map((item, index) =>
-                                    <Event
-                                        key={index}
-                                        {...item}
-                                        onSize={onSize}
-                                    />
-                                )}
-                            </ul>
-                        </div>
-                    )}
-                    {hasRightScroll &&
-                        <div className="section__arrow" onClick={onArrowCLick}></div>
-                    }
-                </div>
-            </section>
+            <Devices />
         </main>;
     }
 
-    setTimeout(() => {
-        const root = ReactDOM.createRoot(document.getElementById('app'));
-        root.render(
-            <>
-                <Header />
-                <Main />
-            </>
-        );
-    }, 0);
+    const root = ReactDOM.createRoot(document.getElementById('app'));
+    root.render(
+        <>
+            <Header />
+            <Main />
+        </>
+    );
 </script>
 
 </body>
