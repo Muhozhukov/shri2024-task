@@ -1,33 +1,23 @@
-/* eslint-disable react/prop-types */
-import { memo, useEffect, useRef } from "react";
+import React from "react";
 
-const Event = memo(function Event({
-    onSize,
-    slim,
-    icon,
-    iconLabel,
-    title,
-    subtitle
-}) {
-    const ref = useRef();
-
-    useEffect(() => {
+export default function Event(props) {
+    const ref = React.useRef();
+    const { onSize } = props;
+    React.useEffect(() => {
         const width = ref.current.offsetWidth;
         const height = ref.current.offsetHeight;
         if (onSize) {
             onSize({ width, height });
         }
-    }, [onSize]);
+    });
 
-    return <li ref={ref} className={'event' + (slim ? ' event_slim' : '')}>
+    return <li ref={ref} className={'event' + (props.slim ? ' event_slim' : '')}>
         <button className="event__button">
-            <span className={`event__icon event__icon_${icon}`} role="img" aria-label={iconLabel}></span>
-            <h4 className="event__title">{title}</h4>
-            {subtitle &&
-                <span className="event__subtitle">{subtitle}</span>
+            <span className={`event__icon event__icon_${props.icon}`} role="img" aria-label={props.iconLabel}></span>
+            <h4 className="event__title">{props.title}</h4>
+            {props.subtitle &&
+                <span className="event__subtitle">{props.subtitle}</span>
             }
         </button>
     </li>;
-})
-
-export default Event;
+}

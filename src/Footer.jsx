@@ -1,6 +1,7 @@
-import { createPortal } from "react-dom";
+import React from 'react';
+import { createPortal } from 'react-dom';
 
-function Footer() {
+const Footer = () => {
     return createPortal(
         <footer className="footer">
             <ul className="footer__list">
@@ -17,13 +18,13 @@ function Footer() {
                     <a className="footer__link" href="/">Условия использования</a>
                 </li>
             </ul>
-
+        
             <div className="footer__copyright">
                 © 1997–2023 ООО «Яндекс»
             </div>
         </footer>,
-        document.body
+    document.body
     );
-}
+};
 
 export default Footer;
