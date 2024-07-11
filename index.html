@@ -203,7 +203,7 @@
     };
     for (let i = 0; i < 6; ++i) {
         // TABS.all.items = [...TABS.all.items, ...TABS.all.items];
-        TABS.all.items = [].concat(TABS.all.items, TABS.all.items);
+        // TABS.all.items = [].concat(TABS.all.items, TABS.all.items);
     }
     const TABS_KEYS = Object.keys(TABS);
 
@@ -213,6 +213,7 @@
         const [activeTab, setActiveTab] = React.useState('');
         const [hasRightScroll, setHasRightScroll] = React.useState(false);
         const [tabData, setTabData] = React.useState(TABS.all);
+        const [sizes, setSizes] = React.useState([]);
 
         const onSelectInput = event => {
             const selectedTab = event.target.value;
@@ -220,10 +221,9 @@
             setTabData(TABS[selectedTab]);
         };
 
-        let sizes = [];
-        const onSize = size => {
-            sizes = [...sizes, size];
-        };
+        const onSize = React.useCallback(size => {
+            setSizes(prevSizes => [...prevSizes, size]);
+        }, []);
 
         React.useEffect(() => {
             if (!activeTab && !initedRef.current) {
